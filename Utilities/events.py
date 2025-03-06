@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Hookens
+# See the LICENSE file in the project root for details.
+
 from discord import ApplicationContext, MessageType, RawReactionActionEvent, TextChannel
 from discord.activity import Activity
 from discord.bot import Bot
