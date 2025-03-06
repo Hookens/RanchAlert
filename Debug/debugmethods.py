@@ -50,25 +50,13 @@ class DebugMethods(commands.Cog):
         for cog in DebugLists.COGS:
             cogdict[cog] = self.bot.get_cog(cog)
             
-        admincogs = {k:v for (k,v) in cogdict.items() if "Admin" in k}
-        bundlecogs = {k:v for (k,v) in cogdict.items() if "Bundle" in k}
         debugcogs = {k:v for (k,v) in cogdict.items() if "Debug" in k}
-        helpcogs = {k:v for (k,v) in cogdict.items() if "Help" in k}
-        usercogs = {k:v for (k,v) in cogdict.items() if "User" in k}
-        othercogs = {k:v for (k,v) in cogdict.items() if "Admin" not in k and "Bundle" not in k and "Debug" not in k and "Help" not in k and "User" not in k}
+        othercogs = {k:v for (k,v) in cogdict.items() if "Debug" not in k}
 
-        adminfields = ''.join([f"{'🟢' if v is not None else '🔴' } {k}\n" for (k,v) in admincogs.items()])
-        bundlefields = ''.join([f"{'🟢' if v is not None else '🔴' } {k}\n" for (k,v) in bundlecogs.items()])
         debugfields = ''.join([f"{'🟢' if v is not None else '🔴' } {k}\n" for (k,v) in debugcogs.items()])
-        helpfields = ''.join([f"{'🟢' if v is not None else '🔴' } {k}\n" for (k,v) in helpcogs.items()])
-        userfields = ''.join([f"{'🟢' if v is not None else '🔴' } {k}\n" for (k,v) in usercogs.items()])
         otherfields = ''.join([f"{'🟢' if v is not None else '🔴' } {k}\n" for (k,v) in othercogs.items()])
 
-        embed.add_field(name="Admin", value=adminfields, inline=False)
-        embed.add_field(name="Bundle", value=bundlefields, inline=False)
         embed.add_field(name="Debug", value=debugfields, inline=False)
-        embed.add_field(name="Help", value=helpfields, inline=False)
-        embed.add_field(name="User", value=userfields, inline=False)
         embed.add_field(name="Utilities", value=otherfields, inline=False)
         embed.add_field(name="Server Count", value=f"Serving {len(self.bot.guilds)} servers")
         
