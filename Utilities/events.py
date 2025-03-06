@@ -1,79 +1,55 @@
 # Copyright (C) 2025 Hookens
 # See the LICENSE file in the project root for details.
 
-from discord import ApplicationContext, MessageType, RawReactionActionEvent, TextChannel
+from discord import Embed, TextChannel
 from discord.activity import Activity
 from discord.bot import Bot
 from discord.enums import ActivityType
 from discord.ext import commands
-from discord.guild import Guild
 from discord.member import Member
-from discord.message import Message
-import traceback
+
+from Debug.debughelpers import try_func_async
+from Utilities.constants import Env, LoggingDefaults
+
+from typing import TYPE_CHECKING, Optional
+if TYPE_CHECKING:
+    from Debug.logging import Logging
+    from Utilities.embeds import Embeds
 
 class Events(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+    
+    async def _handle_member_presence(self, member: Member, joining: bool = True):
+        if member.guild.id != Env.GUILD_ID: return
+        
+        embeds: Optional[Embeds] = self.bot.get_cog("Embeds")
+        channel: Optional[TextChannel] = self.bot.get_channel(Env.LOG_CHANNEL)
+        if not (embeds and channel): return
+        
+        embed: Embed = await embeds.generate_embed_member_join(member) if joining else await embeds.generate_embed_member_leave(member)
+        await channel.send(embed)
 
     @commands.Cog.listener()
+    @try_func_async()
     async def on_ready (self):
-        try:
-            cogcheck: int = 1
-            
-            logging = self.bot.get_cog("Logging")
-            if logging is not None:
-                cogcheck += 1
-            if self.bot.get_cog("Embeds") is not None:
-                cogcheck += 1
-            if self.bot.get_cog("DebugMethods") is not None:
-                cogcheck += 1
-            if self.bot.get_cog("DebugCommands") is not None:
-                cogcheck += 1
-            
-            await self.bot.change_presence(activity=Activity(type=ActivityType.listening, name="the Cattlemen"))
-            
-            if logging is not None:
-                await logging.log_event(f"RanchAlert is up. {cogcheck} of 5 cogs running.", "INFO")
+        await self.bot.change_presence(activity=Activity(type=ActivityType.watching, name="the Cattlemen"))
 
-        except Exception as e:
-            if logging is not None:
-                await logging.log_error(e,'events - on_ready', traceback.format_exc())
+        logging: Logging = self.bot.get_cog("Logging")
+        if not logging: return
         
-        return
+        await logging.log_event(f"{LoggingDefaults.NAME} is up. {len(self.bot.cogs)} of {LoggingDefaults.COG_COUNT} cogs running. Currently serving {len(self.bot.guilds)} servers.", "INFO")
+
 
     @commands.Cog.listener()
+    @try_func_async()
     async def on_member_join(self, member: Member):
-        try:
-            if member.guild.id == 863766962529632286:
-                embeds = self.bot.get_cog("Embeds")
-                if embeds is not None:
-                    channel: TextChannel = self.bot.get_channel(1099822917036032010)
-                    if channel is not None:
-                        await channel.send(embed=await embeds.generate_embed_member_join(member))
-
-        except Exception as e:
-            logging = self.bot.get_cog("Logging")
-            if logging is not None:
-                await logging.log_error(e,'events - on_member_join', traceback.format_exc())
-        
-        return
+        await self._handle_member_presence(member)
     
     @commands.Cog.listener()
+    @try_func_async()
     async def on_member_remove(self, member: Member):
-        try:
-            if member.guild.id == 863766962529632286:
-                embeds = self.bot.get_cog("Embeds")
-                if embeds is not None:
-                    channel: TextChannel = self.bot.get_channel(1099822917036032010)
-                    if channel is not None:
-                        await channel.send(embed=await embeds.generate_embed_member_leave(member))
-
-        except Exception as e:
-            logging = self.bot.get_cog("Logging")
-            if logging is not None:
-                await logging.log_error(e,'events - on_member_remove', traceback.format_exc())
-        
-        return
+        await self._handle_member_presence(member, False)
 
 def setup(bot):
     bot.add_cog(Events(bot))
