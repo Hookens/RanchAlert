@@ -27,7 +27,7 @@ class Events(commands.Cog):
         channel: Optional[TextChannel] = self.bot.get_channel(Env.LOG_CHANNEL)
         if not (embeds and channel): return
         
-        embed: Embed = await embeds.generate_embed_member_join(member) if joining else await embeds.generate_embed_member_leave(member)
+        embed: Embed = embeds.generate_embed_member_join(member) if joining else embeds.generate_embed_member_leave(member)
         await channel.send(embed)
 
     @commands.Cog.listener()

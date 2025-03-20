@@ -24,19 +24,19 @@ class Embeds(commands.Cog):
 
         return embed
 
-    async def generate_embed_member_join(self, member: Member) -> Embed :
+    def generate_embed_member_join(self, member: Member) -> Embed :
         url = None
         if member.avatar is not None:
             url = member.avatar.url
         
-        return await self.generate_embed(title=f"{member.display_name}", description=f"{member.mention} has joined.", color=0x00CC00, image=url, footer=f"id: {member.id}", Creation=f"<t:{int(member.created_at.timestamp())}:R>")
+        return self.generate_embed(title=f"{member.display_name}", description=f"{member.mention} has joined.", color=0x00CC00, image=url, footer=f"id: {member.id}", Creation=f"<t:{int(member.created_at.timestamp())}:R>")
 
-    async def generate_embed_member_leave(self, member: Member) -> Embed :
+    def generate_embed_member_leave(self, member: Member) -> Embed :
         url = None
         if member.avatar is not None:
             url = member.avatar.url
 
-        return await self.generate_embed(title=f"{member.display_name}", description=f"{member.mention} has left.", color=0xCC0000, image=url, footer=f"id: {member.id}", Joined=f"<t:{int(member.joined_at.timestamp())}:R>")
+        return self.generate_embed(title=f"{member.display_name}", description=f"{member.mention} has left.", color=0xCC0000, image=url, footer=f"id: {member.id}", Joined=f"<t:{int(member.joined_at.timestamp())}:R>")
 
     #Debug
     def cog_restarted(self, cog: str) -> Embed:
