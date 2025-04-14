@@ -28,7 +28,7 @@ class Events(commands.Cog):
         if not (embeds and channel): return
         
         embed: Embed = embeds.generate_embed_member_join(member) if joining else embeds.generate_embed_member_leave(member)
-        await channel.send(embed)
+        await channel.send(embed=embed)
 
     @commands.Cog.listener()
     @try_func_async()
